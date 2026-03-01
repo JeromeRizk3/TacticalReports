@@ -14,6 +14,9 @@ export class Record {
 
   @Prop({ type: Date, default: null })
   published_at: Date | null;
+
+  @Prop({ type: String, default: null })
+  image_url: string | null;
 }
 
 export type RecordDocument = Record & Document;
