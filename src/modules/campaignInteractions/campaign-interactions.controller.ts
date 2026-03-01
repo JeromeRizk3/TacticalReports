@@ -1,5 +1,6 @@
 import { Controller, Get, Post, Body, Param } from '@nestjs/common';
 import { CampaignInteractionsService } from './campaign-interactions.service';
+import { CreateCampaignInteractionDto } from './dto/create-campaign-interaction.dto';
 
 @Controller('campaign-interactions')
 export class CampaignInteractionsController {
@@ -8,15 +9,7 @@ export class CampaignInteractionsController {
   ) {}
 
   @Post()
-  create(
-    @Body()
-    body: {
-      user_id: string;
-      report_id: string;
-      campaign_type: string;
-      action: string;
-    },
-  ) {
+  create(@Body() body: CreateCampaignInteractionDto) {
     return this.campaignInteractionsService.create(
       body.user_id,
       body.report_id,

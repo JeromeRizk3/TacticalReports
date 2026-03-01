@@ -1,19 +1,13 @@
 import { Controller, Get, Post, Body, Param } from '@nestjs/common';
 import { ViewHistoryService } from './view-history.service';
+import { CreateViewHistoryDto } from './dto/create-view-history.dto';
 
 @Controller('view-history')
 export class ViewHistoryController {
   constructor(private readonly viewHistoryService: ViewHistoryService) {}
 
   @Post()
-  create(
-    @Body()
-    body: {
-      user_id: string;
-      report_id: string;
-      dwell_time_seconds: number;
-    },
-  ) {
+  create(@Body() body: CreateViewHistoryDto) {
     return this.viewHistoryService.create(
       body.user_id,
       body.report_id,

@@ -10,7 +10,15 @@ export class FeedController {
     @Query('userId') userId: string,
     @Query('page') page: string = '1',
     @Query('limit') limit: string = '10',
+    @Query('search') search?: string,
+    @Query('category') category?: string,
   ) {
-    return this.feedService.getFeed(userId, parseInt(page), parseInt(limit));
+    return this.feedService.getFeed(
+      userId,
+      parseInt(page),
+      parseInt(limit),
+      search,
+      category,
+    );
   }
 }

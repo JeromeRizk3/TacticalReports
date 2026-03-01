@@ -1,12 +1,13 @@
 import { Controller, Get, Post, Body, Param } from '@nestjs/common';
 import { PurchasesService } from './purchases.service';
+import { CreatePurchaseDto } from './dto/create-purchase.dto';
 
 @Controller('purchases')
 export class PurchasesController {
   constructor(private readonly purchasesService: PurchasesService) {}
 
   @Post()
-  create(@Body() body: { user_id: string; report_id: string }) {
+  create(@Body() body: CreatePurchaseDto) {
     return this.purchasesService.create(body.user_id, body.report_id);
   }
 

@@ -18,8 +18,21 @@ export class FeedService {
     private readonly config: ConfigService,
   ) {}
 
-  async getFeed(userId: string, page: number = 1, limit: number = 10) {
-    const records = await this.recordModel.find();
+  async getFeed(
+    userId: string,
+    page: number = 1,
+    limit: number = 10,
+    search?: string,
+    category?: string,
+  ) {
+    let query: any = {};
+    if (search) {
+      query.title = { $regex: search, $options: 'i' };
+    }
+    if (category) {
+      query.category = category;
+    }
+    const records = await this.recordModel.find(query);
 
     const [viewHistory, purchases, campaignInteractions] = await Promise.all([
       this.viewHistoryService.findByUserId(userId),
