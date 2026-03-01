@@ -1,5 +1,4 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { v4 as uuidv4 } from 'uuid';
 import { LoginDto } from './dto/login.dto';
 import { User } from './schemas/user.schema';
 
@@ -7,36 +6,56 @@ import { User } from './schemas/user.schema';
 export class AuthenticationService {
   private users: User[] = [
     {
-        id: uuidv4(),
-        email: 'demo@example.com',
-        password: 'demo123',
-        firstName: 'Demo',
-        lastName: 'User',
-        createdAt: new Date(),
-        updatedAt: new Date(),
+      id: '507f1f77bcf86cd799439010',
+      email: 'demo@example.com',
+      password: 'demo123',
+      firstName: 'Demo',
+      lastName: 'User',
+      createdAt: new Date(),
+      updatedAt: new Date(),
     },
     {
-        id: uuidv4(),
-        email: 'demo2@example.com',
-        password: 'demo123',
-        firstName: 'Demo2',
-        lastName: 'User2',
-        createdAt: new Date(),
-        updatedAt: new Date(),
+      id: '507f1f77bcf86cd799439011',
+      email: 'demo2@example.com',
+      password: 'demo123',
+      firstName: 'Demo2',
+      lastName: 'User2',
+      createdAt: new Date(),
+      updatedAt: new Date(),
     },
     {
-        id: uuidv4(),
-        email: 'demo3@example.com',
-        password: 'demo123',
-        firstName: 'Demo3',
-        lastName: 'User3',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-    }
+      id: '507f1f77bcf86cd799439012',
+      email: 'demo3@example.com',
+      password: 'demo123',
+      firstName: 'Demo3',
+      lastName: 'User3',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      id: '507f1f77bcf86cd799439013',
+      email: 'demo4@example.com',
+      password: 'demo123',
+      firstName: 'Demo4',
+      lastName: 'User4',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      id: '507f1f77bcf86cd799439014',
+      email: 'demo5@example.com',
+      password: 'demo123',
+      firstName: 'Demo5',
+      lastName: 'User5',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
   ];
 
   async validateUser(email: string, password: string): Promise<User | null> {
-    const user = this.users.find((u) => u.email === email && u.password === password);
+    const user = this.users.find(
+      (u) => u.email === email && u.password === password,
+    );
     return user ?? null;
   }
 
@@ -49,4 +68,3 @@ export class AuthenticationService {
     return { accessToken: `fake-token-for-${user.id}` };
   }
 }
-

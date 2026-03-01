@@ -2,7 +2,7 @@ import { Body, Controller, Post } from '@nestjs/common';
 import { AuthenticationService } from './authentication.service';
 import { LoginDto } from './dto/login.dto';
 
-@Controller('authentication')
+@Controller('auth')
 export class AuthenticationController {
   constructor(private readonly authService: AuthenticationService) {}
 
@@ -11,4 +11,3 @@ export class AuthenticationController {
     return this.authService.login(loginDto);
   }
 }
-
