@@ -79,8 +79,7 @@ export class FeedService {
       }
 
       if (purchasedCategories.includes(record.category)) {
-        const categoryNames = purchasedCategories.join(' and ');
-        reasons.unshift(`because you purchased ${categoryNames} reports`);
+        reasons.unshift(`because you purchased ${record.category} reports`);
       }
 
       const { tags, ...recordWithoutTags } = record.toObject();
