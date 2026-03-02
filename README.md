@@ -1,98 +1,79 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Tactical Reports Demo
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+This repository contains a **NestJS** application that simulates the backend for a tactical reports website. It’s designed as a demo with in-memory data for authentication and MongoDB (via Mongoose) for storing various user interactions.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+---
 
-## Description
+## Core Features
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- **User authentication** with fake tokens (`/authentication/login`).
+- **Feed generation** (`/feed`) based on user behavior and interactions.
+  - Weighted scoring from purchases, view history, and campaign interactions
+  - Pagination, search, and category filtering
+  - Automatically returns explanations for why a report is recommended
+- **Interaction tracking** modules:
+  - **Purchases** (`/purchases`) – record when a user buys a report
+  - **View history** (`/view-history`) – log views with dwell time
+  - **Campaign interactions** (`/campaign-interactions`) – capture user actions on marketing campaigns
+- **Modular design** following NestJS conventions: each feature has its own module, controller, service, schema, and DTOs.
 
-## Project setup
+## Code Highlights & Structure
 
-```bash
-$ npm install
+```
+src/
+ ├─ modules/
+ │   ├─ authentication/      # simple in-memory user store and login logic
+ │   ├─ feed/                # main recommendation logic
+ │   │   ├─ schemas/         # Mongoose schema for `Record`
+ │   │   ├─ feed.service.ts  # scoring and pagination
+ │   │   ├─ feed.controller.ts
+ │   ├─ purchases/           # purchase schema, service, controller
+ │   ├─ viewHistory/         # similar structure with dwell time metadata
+ │   └─ campaignInteractions/
+ ├─ init/database/           # bootstrap mongoose connection
+ └─ main.ts                  # NestJS bootstrap
 ```
 
-## Compile and run the project
+- **DTOs** are used for request validation; create endpoints now accept typed objects. Example: `CreatePurchaseDto`.
+- **ConfigService** powers adjustable weights (e.g. `PURCHASE_WEIGHT`) for scoring logic.
+- **Pagination & Filtering** are implemented in `FeedService.getFeed()` with query parameters.
+
+## Database
+
+The app uses MongoDB with Mongoose. Schemas include:
+
+- `Record` – represents a tactical report with `title`, `category`, `published_at`, `image_url`, etc.
+- `Purchase`, `ViewHistory`, and `CampaignInteraction` documents track user activity.
+
+Sample JSON data is included earlier in the conversation for manual insertion via MongoDB Compass.
+
+## Getting Started
+
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+2. Run the app (ensure MongoDB is running locally):
+   ```bash
+   npm run start:dev
+   ```
+3. Use tools like Postman or curl to hit the endpoints:
+   - `POST /authentication/login` with email/password.
+   - Include returned token in subsequent requests (demo app does not enforce auth).
+
+## Testing
+
+Basic controller and service spec files are provided for each module. Run:
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+npm run test
 ```
 
-## Run tests
+## Notes
 
-```bash
-# unit tests
-$ npm run test
+- This is a demo and not production‑hardened. Credentials are stored in memory.
+- The feed logic is intentionally simple but showcases how multiple interaction sources can be combined for ranking.
 
-# e2e tests
-$ npm run test:e2e
+---
 
-# test coverage
-$ npm run test:cov
-```
-
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+Feel free to expand on modules, add validation, or connect a real auth provider! Happy hacking.
