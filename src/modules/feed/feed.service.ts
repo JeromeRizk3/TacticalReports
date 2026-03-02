@@ -43,43 +43,61 @@ export class FeedService {
     const purchasedReports = await this.recordModel.find({
       _id: { $in: purchases.map((p) => p.report_id) },
     });
-    const purchasedCategories = [
-      ...new Set(purchasedReports.map((r) => r.category)),
-    ];
+
+    const categoryScores: any = {};
+
+    purchasedReports.forEach((r) => {
+      const cat = r.category;
+      if (!categoryScores[cat]) {
+        categoryScores[cat] = { purchaseCount: 0, campaignCount: 0 };
+      }
+      categoryScores[cat].purchaseCount += 1;
+    });
+
+    const recordMap = new Map<string, RecordDocument>(
+      records.map((r) => [r._id.toString(), r]),
+    );
+    campaignInteractions.forEach((c) => {
+      const rec = recordMap.get(c.report_id.toString());
+      if (rec) {
+        const cat = rec.category;
+        if (!categoryScores[cat]) {
+          categoryScores[cat] = { purchaseCount: 0, campaignCount: 0 };
+        }
+        categoryScores[cat].campaignCount += 1;
+      }
+    });
 
     const recordsWithScore = records.map((record) => {
       let score = 0;
       const reasons: string[] = [];
 
-      const purchaseCount = purchases.filter(
-        (p) => p.report_id.toString() === record._id.toString(),
-      ).length;
-      if (purchaseCount > 0) {
-        score +=
-          purchaseCount * (this.config.get<number>('PURCHASE_WEIGHT') ?? 10);
+      const purchaseWeight = this.config.get<number>('PURCHASE_WEIGHT') ?? 10;
+      const campaignWeight =
+        this.config.get<number>('CAMPAIGN_INTERACTION_WEIGHT') ?? 5;
+      const viewWeight = this.config.get<number>('VIEW_WEIGHT') ?? 1;
+
+      const catData = categoryScores[record.category] || {
+        purchaseCount: 0,
+        campaignCount: 0,
+      };
+      if (catData.purchaseCount > 0) {
+        score += catData.purchaseCount * purchaseWeight;
+        reasons.push(`because you purchased ${record.category} reports`);
+      }
+      if (catData.campaignCount > 0) {
+        score += catData.campaignCount * campaignWeight;
+        reasons.push(
+          `because you interacted with ${record.category} campaigns`,
+        );
       }
 
       const viewHistoryEntries = viewHistory.filter(
         (v) => v.report_id.toString() === record._id.toString(),
       );
       if (viewHistoryEntries.length > 0) {
-        score +=
-          viewHistoryEntries.length *
-          (this.config.get<number>('VIEW_WEIGHT') ?? 1);
+        score += viewHistoryEntries.length * viewWeight;
         reasons.push('recently viewed similar content');
-      }
-
-      const campaignCount = campaignInteractions.filter(
-        (c) => c.report_id.toString() === record._id.toString(),
-      ).length;
-      if (campaignCount > 0) {
-        score +=
-          campaignCount *
-          (this.config.get<number>('CAMPAIGN_INTERACTION_WEIGHT') ?? 5);
-      }
-
-      if (purchasedCategories.includes(record.category)) {
-        reasons.unshift(`because you purchased ${record.category} reports`);
       }
 
       const { tags, ...recordWithoutTags } = record.toObject();
